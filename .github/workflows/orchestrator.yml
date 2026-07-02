@@ -1,0 +1,128 @@
+name: Security Orchestrator
+# Single entry point — orchestrates all security scans committed by DSOMM Accelerator.
+# Each sub-workflow is called via workflow_call.
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  sca:
+    uses: ./.github/workflows/sca.yml
+    secrets: inherit
+
+  sbom:
+    uses: ./.github/workflows/sbom.yml
+    secrets: inherit
+
+  secrets_baseline:
+    uses: ./.github/workflows/secrets-baseline.yml
+    secrets: inherit
+
+  iac_scan:
+    uses: ./.github/workflows/iac-scan.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  iac_scan:
+    uses: ./.github/workflows/iac-scan.yml
+    secrets: inherit
+
+  iac_scan:
+    uses: ./.github/workflows/iac-scan.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  security_alerts:
+    uses: ./.github/workflows/security-alerts.yml
+    secrets: inherit
+
+  security_alerts:
+    uses: ./.github/workflows/security-alerts.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  iac_scan:
+    uses: ./.github/workflows/iac-scan.yml
+    secrets: inherit
+
+  sca:
+    uses: ./.github/workflows/sca.yml
+    secrets: inherit
+
+  dast:
+    uses: ./.github/workflows/dast.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  supply_chain:
+    uses: ./.github/workflows/supply-chain.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  dast:
+    uses: ./.github/workflows/dast.yml
+    secrets: inherit
+
+  iac_scan:
+    uses: ./.github/workflows/iac-scan.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  security_gate:
+    uses: ./.github/workflows/security-gate.yml
+    secrets: inherit
+
+  threat_intelligence:
+    uses: ./.github/workflows/threat-intelligence.yml
+    secrets: inherit
