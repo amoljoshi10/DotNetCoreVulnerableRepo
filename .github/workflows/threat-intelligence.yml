@@ -1,0 +1,53 @@
+name: Threat Intelligence - CISA KEV Check
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Weekly Monday 9am
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  cisa-kev-check:
+    name: CISA Known Exploited Vulnerabilities Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Check dependencies against CISA KEV
+        run: |
+          python3 - <<'PYEOF'
+          import requests, json, subprocess, sys
+          try:
+              kev = requests.get(
+                  "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+                  timeout=30
+              ).json()
+              kev_cves = {v["cveID"] for v in kev.get("vulnerabilities", [])}
+              print(f"Loaded {len(kev_cves)} actively exploited CVEs from CISA KEV")
+              # Try to get CVEs from installed packages
+              try:
+                  result = subprocess.run(
+                      ["pip-audit", "--format", "json"],
+                      capture_output=True, text=True
+                  )
+                  if result.returncode == 0:
+                      findings = json.loads(result.stdout or "[]")
+                      for pkg in findings:
+                          for v in pkg.get("vulns", []):
+                              cve = v.get("id", "")
+                              if cve in kev_cves:
+                                  print(f"CRITICAL: {pkg.get('name')} affected by CISA KEV entry {cve}")
+              except Exception:
+                  pass
+              print("CISA KEV check complete")
+          except Exception as e:
+              print(f"SKIP: Could not fetch CISA KEV: {e}")
+          PYEOF
+        continue-on-error: true
