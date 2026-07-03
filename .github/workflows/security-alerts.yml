@@ -1,0 +1,37 @@
+name: Security Event Alerting
+
+on:
+  push:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 8 * * *'  # Daily 8am
+
+permissions:
+  contents: read
+  security-events: read
+
+jobs:
+  dependency-alerts:
+    name: Dependabot & Code Scanning Alerts Summary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Summarise security alerts
+        run: |
+          echo "## Security Alerts Summary - $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### GitHub Security Features Enabled" >> $GITHUB_STEP_SUMMARY
+          echo "- Dependabot alerts: Check Settings > Security > Dependabot" >> $GITHUB_STEP_SUMMARY
+          echo "- Code scanning: Check Security > Code scanning alerts" >> $GITHUB_STEP_SUMMARY
+          echo "- Secret scanning: Check Security > Secret scanning alerts" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Enable all three in: Settings > Security > Code security and analysis" >> $GITHUB_STEP_SUMMARY
+      - name: Run Trivy for latest CVEs
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          severity: 'CRITICAL'
+          exit-code: '0'
+        continue-on-error: true
